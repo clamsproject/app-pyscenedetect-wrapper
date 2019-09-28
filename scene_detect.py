@@ -22,7 +22,7 @@ class SceneDetection(ClamApp):
                     "description": "This tool detects scenes using the pySceneDetect library.",
                     "vendor": "Team CLAMS",
                     "requires": [MediaTypes.V],
-                    "produces": [AnnotationTypes.SCD]}
+                    "produces": [AnnotationTypes.SHOT]}
         return metadata
 
     def sniff(self, mmif):
