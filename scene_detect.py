@@ -37,14 +37,14 @@ class SceneDetection(ClamApp):
         scenes_output = self.run_sd(video_filename) #scenes_output is a list of frame number interval tuples
 
         new_view = mmif.new_view()
-        contain = new_view.new_contain(AnnotationTypes.SCD)
+        contain = new_view.new_contain(AnnotationTypes.SHOT)
         contain.producer = self.__class__
 
         for int_id, (start_frame, end_frame) in enumerate(scenes_output):
             annotation = new_view.new_annotation(int_id)
             annotation.start = str(start_frame)
             annotation.end = str(end_frame)
-            annotation.attype = AnnotationTypes.SCD
+            annotation.attype = AnnotationTypes.SHOT
 
         for contain in new_view.contains.keys():
             mmif.contains.update({contain: new_view.id})
