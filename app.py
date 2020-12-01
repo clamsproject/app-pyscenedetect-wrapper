@@ -1,10 +1,4 @@
-import cv2
-import pickle
-
 from clams.serve import ClamApp
-from clams.serialize import *
-from clams.vocab import AnnotationTypes
-from clams.vocab import MediaTypes
 from clams.restify import Restifier
 
 # Standard PySceneDetect imports:
@@ -16,10 +10,9 @@ from scenedetect.detectors.content_detector import ContentDetector
 
 
 class SceneDetection(ClamApp):
-
     def appmetadata(self):
-        metadata = {"name": "Scene Detection",
-                    "description": "This tool detects scenes using the pySceneDetect library.",
+        metadata = {"name": "Shot Detection",
+                    "description": "This tool detects shots using the pySceneDetect library.",
                     "vendor": "Team CLAMS",
                     "requires": [MediaTypes.V],
                     "produces": [AnnotationTypes.SHOT]}
