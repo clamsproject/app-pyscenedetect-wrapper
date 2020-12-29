@@ -1,5 +1,6 @@
 from clams.serve import ClamsApp
 from clams.restify import Restifier
+from mmif.vocabulary import DocumentTypes, AnnotationTypes
 
 # Standard PySceneDetect imports:
 from scenedetect.video_manager import VideoManager
