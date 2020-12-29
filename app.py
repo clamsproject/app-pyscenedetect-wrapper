@@ -9,12 +9,15 @@ from scenedetect.scene_manager import SceneManager
 # For content-aware scene detection:
 from scenedetect.detectors.content_detector import ContentDetector
 
+APP_VERSION = 0.1
+
 
 class SceneDetection(ClamsApp):
     def setupmetadata(self):
         metadata = {"name": "Shot Detection",
                     "description": "This tool detects shots using the PySceneDetect library.",
                     "vendor": "Team CLAMS",
+                    "iri": f"http://mmif.clams.ai/apps/pyscenedetect/{APP_VERSION}",
                     "requires": [DocumentTypes.VideoDocument],
                     "produces": [AnnotationTypes.TimeFrame]}
         return metadata
@@ -27,8 +30,10 @@ class SceneDetection(ClamsApp):
         scenes_output = self.run_sd(mmif) #scenes_output is a list of frame number interval tuples
 
         new_view = mmif.new_view()
+        new_view.metadata['app'] = self.metadata["iri"]
+
         contain = new_view.new_contain(AnnotationTypes.TimeFrame, {"unit":"frame"})
-        contain.producer = self.__class__
+        contain.producer =  "app-scene-detect" ##todo 2020-12-29 kelleylynch un-hardcode this
 
         for int_id, (start_frame, end_frame) in enumerate(scenes_output):
             annotation = new_view.new_annotation(f"sh_{int_id}", AnnotationTypes.TimeFrame)
