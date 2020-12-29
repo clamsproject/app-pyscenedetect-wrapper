@@ -1,4 +1,4 @@
-from clams.serve import ClamApp
+from clams.serve import ClamsApp
 from clams.restify import Restifier
 
 # Standard PySceneDetect imports:
@@ -9,53 +9,41 @@ from scenedetect.scene_manager import SceneManager
 from scenedetect.detectors.content_detector import ContentDetector
 
 
-class SceneDetection(ClamApp):
-    def appmetadata(self):
+class SceneDetection(ClamsApp):
+    def setupmetadata(self):
         metadata = {"name": "Shot Detection",
-                    "description": "This tool detects shots using the pySceneDetect library.",
+                    "description": "This tool detects shots using the PySceneDetect library.",
                     "vendor": "Team CLAMS",
-                    "requires": [MediaTypes.V],
-                    "produces": [AnnotationTypes.SHOT]}
+                    "requires": [DocumentTypes.VideoDocument],
+                    "produces": [AnnotationTypes.TimeFrame]}
         return metadata
 
     def sniff(self, mmif):
-        # this mock-up method always returns true
+        ##todo 2020-12-29 kelleylynch implement sniff method
         return True
 
     def annotate(self, mmif):
-        if type(mmif) is not Mmif:
-            mmif = Mmif(mmif)
-        video_filename = mmif.get_medium_location(MediaTypes.V)
-        print (video_filename)
-        scenes_output = self.run_sd(video_filename) #scenes_output is a list of frame number interval tuples
+        scenes_output = self.run_sd(mmif) #scenes_output is a list of frame number interval tuples
 
         new_view = mmif.new_view()
-        contain = new_view.new_contain(AnnotationTypes.SHOT)
+        contain = new_view.new_contain(AnnotationTypes.TimeFrame, {"unit":"frame"})
         contain.producer = self.__class__
 
         for int_id, (start_frame, end_frame) in enumerate(scenes_output):
-            annotation = new_view.new_annotation(int_id)
-            annotation.start = str(start_frame)
-            annotation.end = str(end_frame)
-            annotation.attype = AnnotationTypes.SHOT
-
-        for contain in new_view.contains.keys():
-            mmif.contains.update({contain: new_view.id})
+            annotation = new_view.new_annotation(f"sh_{int_id}", AnnotationTypes.TimeFrame)
+            annotation.add_property("start", start_frame)
+            annotation.add_property("end", end_frame)
         return mmif
 
     @staticmethod
-    def run_sd(video_filename):
-        # detect scenes
-        ##type: (str) -> List[Tuple[FrameTimecode, FrameTimecode]]
-        video_manager = VideoManager([video_filename])
+    def run_sd(mmif):
+        video_manager = VideoManager([mmif.get_document_location(DocumentTypes.VideoDocument)])
         scene_manager = SceneManager()
 
-        # Add ContentDetector algorithm (each detector's constructor
-        # takes detector options, e.g. threshold).
         scene_manager.add_detector(ContentDetector())
+        ##todo 2020-12-01 kelleylynch incorporate option for threshold detector
         base_timecode = video_manager.get_base_timecode()
 
-        scene_list = []
         try:
             # Set downscale factor to improve processing speed.
             video_manager.set_downscale_factor()
@@ -70,7 +58,6 @@ class SceneDetection(ClamApp):
             scene_list = scene_manager.get_scene_list(base_timecode)
             # Each scene is a tuple of (start, end) FrameTimecodes.
             scenes = map(lambda x: (x[0].get_frames(), x[1].get_frames()), scene_list)
-            print (scenes)
 
         finally:
             video_manager.release()
@@ -78,7 +65,6 @@ class SceneDetection(ClamApp):
         return scenes
 
 if __name__ == "__main__":
-    scd_tool = SceneDetection()
-    scd_service = Restifier(scd_tool)
-    scd_service.run()
-
+    tool = SceneDetection()
+    service = Restifier(tool)
+    service.run()
