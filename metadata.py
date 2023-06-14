@@ -7,6 +7,7 @@ import re
 
 from mmif import DocumentTypes, AnnotationTypes
 
+from clams.app import ClamsApp
 from clams.appmetadata import AppMetadata
 
 
@@ -25,13 +26,26 @@ def appmetadata() -> AppMetadata:
     metadata.add_input(DocumentTypes.VideoDocument)
     metadata.add_output(AnnotationTypes.TimeFrame, frameType='shot', timeUnit='frame')
     
-    #todo 2020-12-01 kelleylynch incorporate option for threshold detector
-    # metadata.add_parameter(name='a_param', description='example parameter description',
-    #                        type='boolean', default='false')
+    metadata.add_parameter(
+        name='mode', 
+        description='pick a scene detector algorithm, see http://scenedetect.com/projects/Manual/en/latest/cli/detectors.html',
+        type='string',
+        choices=['content', 'threshold', 'adaptive'],
+        default='content'
+    )
+    metadata.add_parameter(
+        name='threshold',
+        description='threshold value to use in the detection algorithm. Note that the meaning of this numerical value differs for different detector algorithms.',
+        type='number', 
+        default=27.0,
+    )
     return metadata
 
 
 # DO NOT CHANGE the main block
 if __name__ == '__main__':
     import sys
-    sys.stdout.write(appmetadata().jsonify(pretty=True))
+    metadata = appmetadata()
+    for param in ClamsApp.universal_parameters:
+        metadata.add_parameter(**param)
+    sys.stdout.write(metadata.jsonify(pretty=True))

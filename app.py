@@ -4,11 +4,13 @@ import mmif.serialize.model
 from clams.app import ClamsApp
 from clams.restify import Restifier
 from mmif.vocabulary import DocumentTypes, AnnotationTypes
-# For content-aware scene detection:
+# detection algorithms
 from scenedetect.detectors.content_detector import ContentDetector
+from scenedetect.detectors.threshold_detector import ThresholdDetector
+from scenedetect.detectors.adaptive_detector import AdaptiveDetector
 from scenedetect.scene_manager import SceneManager
 # Standard PySceneDetect imports:
-from scenedetect.video_manager import VideoManager
+from scenedetect import open_video
 
 
 class PyscenedetectWrapper(ClamsApp):
@@ -18,7 +20,8 @@ class PyscenedetectWrapper(ClamsApp):
     def _annotate(self, mmif, **kwargs):
         config = self.get_configuration(**kwargs)
         for vd in mmif.get_documents_by_type(DocumentTypes.VideoDocument):
-            scenes_output = self.run_sd(vd)  # scenes_output is a list of frame number interval tuples
+            # scenes_output is a list of frame number interval tuples
+            scenes_output = self.run_sd(vd, config['mode'], config['threshold'])
             new_view = mmif.new_view()
             self.sign_view(new_view, config)
 
@@ -32,26 +35,19 @@ class PyscenedetectWrapper(ClamsApp):
         return mmif
 
     @staticmethod
-    def run_sd(video_document: mmif.serialize.Document):
-        video_manager = VideoManager([video_document.location_path()])
+    def run_sd(video_document: mmif.serialize.Document, mode: str, threshold: float):
+        video = open_video(video_document.location_path())
         scene_manager = SceneManager()
+        if mode.lower() == 'content':
+            scene_manager.add_detector(ContentDetector(threshold=threshold))
+        elif mode.lower() == 'threshold':
+            scene_manager.add_detector(ThresholdDetector(threshold=threshold))
+        elif mode.lower() == 'adaptive':
+            scene_manager.add_detector(AdaptiveDetector(adaptive_threshold=threshold))
 
-        scene_manager.add_detector(ContentDetector())
-        base_timecode = video_manager.get_base_timecode()
-
-        try:
-            # Set downscale factor to improve processing speed.
-            video_manager.set_downscale_factor()
-            # Start video_manager.
-            video_manager.start()
-            # Perform scene detection on video_manager.
-            scene_manager.detect_scenes(frame_source=video_manager)
-            # Obtain list of detected scenes.
-            scene_list = scene_manager.get_scene_list(base_timecode)
-            # Each scene is a tuple of (start, end) FrameTimecodes.
-            scenes = map(lambda x: (x[0].get_frames(), x[1].get_frames()), scene_list)
-        finally:
-            video_manager.release()
+        scene_manager.detect_scenes(video=video, show_progress=True)
+        scene_list = scene_manager.get_scene_list()
+        scenes = map(lambda x: (x[0].get_frames(), x[1].get_frames()), scene_list)
         return scenes
 
 
