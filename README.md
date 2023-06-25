@@ -7,7 +7,7 @@ A shot boundary is a place where one camera shot ends and another begins. The ap
 
 ## User instruction
 
-General user instruction for CLAMS apps is available at [CLAMS Apps documentation](https://apps.clams.ai/clamsapp/).
+General user instruction for CLAMS apps is available at [CLAMS Apps documentation](https://apps.clams.ai/clamsapp).
 
 ### System requirments
 
