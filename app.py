@@ -1,6 +1,7 @@
 import argparse
 
 import mmif.serialize.model
+import logging
 from clams.app import ClamsApp
 from clams.restify import Restifier
 from mmif.vocabulary import DocumentTypes, AnnotationTypes
@@ -14,6 +15,10 @@ from scenedetect import open_video
 
 
 class PyscenedetectWrapper(ClamsApp):
+
+    def __init__(self):
+        super().__init__()
+        
     def _appmetadata(self):
         pass
 
@@ -53,21 +58,19 @@ class PyscenedetectWrapper(ClamsApp):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "--port", action="store", default="5000", help="set port to listen"
-    )
+    parser.add_argument("--port", action="store", default="5000", help="set port to listen")
     parser.add_argument("--production", action="store_true", help="run gunicorn server")
-    # more arguments as needed
-    # parser.add_argument(more_arg...)
 
     parsed_args = parser.parse_args()
 
     # create the app instance
     app = PyscenedetectWrapper()
 
-    http_app = Restifier(app, port=int(parsed_args.port)
-                         )
+    http_app = Restifier(app, port=int(parsed_args.port))
+    # for running the application in production mode
     if parsed_args.production:
         http_app.serve_production()
+    # development mode
     else:
+        app.logger.setLevel(logging.DEBUG)
         http_app.run()
