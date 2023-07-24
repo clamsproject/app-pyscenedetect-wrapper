@@ -28,7 +28,7 @@ class PyscenedetectWrapper(ClamsApp):
             # scenes_output is a list of frame number interval tuples
             scenes_output = self.run_sd(vd, config['mode'], config['threshold'])
             new_view = mmif.new_view()
-            self.sign_view(new_view, config)
+            self.sign_view(new_view, kwargs)
 
             contain = new_view.new_contain(AnnotationTypes.TimeFrame)
             contain.set_additional_property("timeUnit", "frame")
