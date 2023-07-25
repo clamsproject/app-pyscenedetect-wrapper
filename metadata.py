@@ -16,7 +16,7 @@ def appmetadata() -> AppMetadata:
     
     metadata = AppMetadata(
         name="Pyscenedetect Wrapper",
-        description="",
+        description="CLAMS app wraps PySceneDetect and performs shot boundary detection on input videos",
         app_license="Apache2",
         identifier="pyscenedetect-wrapper",
         url="https://github.com/clamsproject/app-pyscenedetect-wrapper",
