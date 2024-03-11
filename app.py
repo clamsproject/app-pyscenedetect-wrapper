@@ -30,13 +30,12 @@ class PyscenedetectWrapper(ClamsApp):
             new_view = mmif.new_view()
             self.sign_view(new_view, kwargs)
 
-            contain = new_view.new_contain(AnnotationTypes.TimeFrame)
-            contain.set_additional_property("timeUnit", "frame")
+            new_view.new_contain(AnnotationTypes.TimeFrame, timeUnit="frame", document=vd.id)
             for int_id, (start_frame, end_frame) in enumerate(scenes_output):
                 annotation = new_view.new_annotation(AnnotationTypes.TimeFrame)
                 annotation.add_property("start", start_frame)
                 annotation.add_property("end", end_frame)
-                annotation.add_property("frameType", "shot")
+                annotation.add_property("label", "shot")
         return mmif
 
     @staticmethod
