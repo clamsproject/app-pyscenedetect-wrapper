@@ -24,7 +24,7 @@ def appmetadata() -> AppMetadata:
         analyzer_license="BSD-3",
     )
     metadata.add_input(DocumentTypes.VideoDocument)
-    metadata.add_output(AnnotationTypes.TimeFrame, frameType='shot', timeUnit='frame')
+    metadata.add_output(AnnotationTypes.TimeFrame, label='shot', timeUnit='frame')
     
     metadata.add_parameter(
         name='mode', 
