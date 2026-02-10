@@ -55,6 +55,10 @@ class PyscenedetectWrapper(ClamsApp):
         return scenes
 
 
+def get_app():
+    return PyscenedetectWrapper()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", action="store", default="5000", help="set port to listen")
@@ -62,14 +66,11 @@ if __name__ == "__main__":
 
     parsed_args = parser.parse_args()
 
-    # create the app instance
-    app = PyscenedetectWrapper()
+    app = get_app()
 
     http_app = Restifier(app, port=int(parsed_args.port))
-    # for running the application in production mode
     if parsed_args.production:
         http_app.serve_production()
-    # development mode
     else:
         app.logger.setLevel(logging.DEBUG)
         http_app.run()
