@@ -9,10 +9,17 @@ A shot boundary is a place where one camera shot ends and another begins. The ap
 
 General user instruction for CLAMS apps is available at [CLAMS Apps documentation](https://apps.clams.ai/clamsapp).
 
-### System requirments
+### System requirements
 
-* [OpenCV](https://opencv.org/)
-    * To install OpenCV on your system, please refer to the [official documentation](https://docs.opencv.org/4.x/df/d65/tutorial_table_of_content_introduction.html).
+The Python dependencies are installed from `requirements.txt`.
+OpenCV (`cv2`) is pulled in automatically as a dependency of PySceneDetect (`opencv-python`), so you do not install OpenCV yourself.
+
+The `opencv-python` wheel does, however, link against two OS-level shared libraries that it does not bundle, so they must be present on the host:
+
+* `libGL.so.1` (OpenGL) -- on Debian/Ubuntu, `apt-get install -y libgl1`
+* `libgthread-2.0.so.0` (GLib) -- on Debian/Ubuntu, `apt-get install -y libglib2.0-0`
+
+The provided `Containerfile` already installs both, so this only matters when running the app outside the container (e.g. bare-metal development).
 
 ### Configurable runtime parameter
 

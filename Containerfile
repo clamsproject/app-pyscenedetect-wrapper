@@ -1,5 +1,5 @@
 # Use the same base image version as the clams-python python library version
-FROM ghcr.io/clamsproject/clams-python-opencv4:1.4.0
+FROM ghcr.io/clamsproject/clams-python:1.7.1
 # See https://github.com/orgs/clamsproject/packages?tab=packages&q=clams-python for more base images
 # IF you want to automatically publish this image to the clamsproject organization, 
 # 1. you should have generated this template without --no-github-actions flag
@@ -17,6 +17,12 @@ ENV CLAMS_APP_VERSION ${CLAMS_APP_VERSION}
 ################################################################################
 # clams-python base images are based on debian distro
 # install more system packages as needed using the apt manager
+#
+# scenedetect 0.7 depends on the full `opencv-python` (not headless), whose
+# `import cv2` needs libGL + libgthread at runtime. 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
 ################################################################################
 
 ################################################################################

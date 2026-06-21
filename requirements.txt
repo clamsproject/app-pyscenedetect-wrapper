@@ -1,2 +1,5 @@
-clams-python==1.4.0
-scenedetect[opencv-headless]==0.6.1
+clams-python==1.7.1
+mmif-python[cv]
+# scenedetect 0.7 will drag cv2 (`opencv-python`) in as a dependency
+scenedetect==0.7.0
+# we still need libgl as a system dependency
